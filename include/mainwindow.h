@@ -4,6 +4,7 @@
 #pragma once
 #include <QMainWindow>
 #include <map>
+#include <QThread>
 
 //#include "fieldwidget.h"
 #include "messagewidget.h"
@@ -17,13 +18,20 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void createNewMessage(QString data, int id);
+    void createNewControlMessage(QString data, int id);
+    void updateMessage(QString data, int id);
 private:
+    void initInputWidget();
+    void initOutputWidget();
     Ui::MainWindow *ui;
-    std::map<QString, MessageWidget*> inputMessages;
+    std::map<int, MessageWidget*> inputMessages;
+    std::map<int, ControlMessageWidget*> outputMessages;
+signals:
+    void signWriteMessage(std::string);
 public slots:
-    void appendToLog(QString text);
-//    void newNumber(QString msgTitle, QString title);
-    void updateNumber(QString msgTitle, QString title, int value);
+    void slotWriteMessage(std::string);
+    void slotAppendToLog(QString text);
 };
 
 #endif // MAINWINDOW_H

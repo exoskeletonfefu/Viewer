@@ -1,6 +1,7 @@
 #include <QPushButton>
 #include <QLayout>
 #include <map>
+#include <iostream>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -10,64 +11,61 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
     ui->setupUi(this);
-//    layout()->setMargin(0);
-//    layout()->setContentsMargins(0, 0, 0, 0);
-//    layout()->setSpacing(0);
-    ui->outputWidget->setFixedWidth(200);
-    ui->inputWidget->setFixedWidth(200);
+    ui->logTextBrowser->setFixedWidth(400);
 
-    QVBoxLayout *hbl = new QVBoxLayout;
-    hbl->setAlignment(Qt::AlignTop);
-    hbl->setMargin(0);
-    hbl->setContentsMargins(0, 0, 0, 0);
-    hbl->setSpacing(0);
-    ui->inputWidget->widget()->setLayout(hbl);
-    setAttribute(Qt::WA_LayoutUsesWidgetRect);
-//    ui->inputWidget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    initInputWidget();
+    initOutputWidget();
+}
+
+void MainWindow::initInputWidget() {
+    ui->inputWidget->setFixedWidth(250);
+    QVBoxLayout *inputLayout = new QVBoxLayout;
+    inputLayout->setAlignment(Qt::AlignTop);
+    inputLayout->setMargin(0);
+    inputLayout->setContentsMargins(0, 0, 0, 0);
+    inputLayout->setSpacing(0);
+    ui->inputWidget->widget()->setLayout(inputLayout);
+}
+
+void MainWindow::initOutputWidget() {
+    ui->outputWidget->setFixedWidth(250);
+    QVBoxLayout *outputLayout = new QVBoxLayout;
+    outputLayout->setAlignment(Qt::AlignTop);
+    outputLayout->setMargin(0);
+    outputLayout->setContentsMargins(0, 0, 0, 0);
+    outputLayout->setSpacing(0);
+    ui->outputWidget->widget()->setLayout(outputLayout);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::appendToLog(QString text) {
-    ui->textBrowser->append(text);
+void MainWindow::slotAppendToLog(QString text) {
+    ui->logTextBrowser->append(text);
 }
 
-void MainWindow::updateNumber(QString msgTitle, QString title, int value) {
-//    Field *field = ui->inputWidget->widget()->layout()->findChild<Field*>(title);
-//    auto &field = fields.find(title);
-    if (inputMessages.find(msgTitle) != inputMessages.end())
-        inputMessages.at(msgTitle)->updateField(title, value);
-    else {
-        MessageWidget *msg = new MessageWidget(msgTitle);
-        inputMessages.emplace(msgTitle, msg);
-        ui->inputWidget->widget()->layout()->addWidget(msg);
-        FieldWidget *field = new FieldWidget(title, value);
-        msg->addField(field);
-    }
+void MainWindow::createNewMessage(QString data, int id) {
+    MessageWidget *msg = new MessageWidget();
+    msg->parseDocument(data);
+    inputMessages.emplace(id, msg);
+    ui->inputWidget->widget()->layout()->addWidget(msg);
 }
 
-//void MainWindow::newNumber(QString msgTitle, QString title) {
-////    FieldWidget *field = new FieldWidget(title);
-////    field->setObjectName(title);
-////    fields.emplace(title, field);
+void MainWindow::updateMessage(QString data, int id) {
+    MessageWidget *msg = inputMessages.at(id);
+    msg->updateFields(data);
+}
 
-////    QPushButton *pb = new QPushButton;
-////    ui->inputWidget->widget()->layout()->addWidget(pb);
+void MainWindow::createNewControlMessage(QString data, int id) {
+    ControlMessageWidget *msg = new ControlMessageWidget();
+    msg->parseDocument(data);
+    connect(msg, SIGNAL(signWriteData(std::string)), this, SLOT(slotWriteMessage(std::string)));
+    outputMessages.emplace(id, msg);
+    ui->outputWidget->widget()->layout()->addWidget(msg);
+}
 
-////    MessageWidget *mw = new MessageWidget("tmp");
-////    mw->addField(field);
-////    ui->inputWidget->widget()->layout()->addWidget(mw);
-//    MessageWidget *msg;
-//    if (inputMessages.find(msgTitle) == inputMessages.end()) {
-//        msg = new MessageWidget(msgTitle);
-//        inputMessages.emplace(msgTitle, msg);
-//        ui->inputWidget->widget()->layout()->addWidget(msg);
-//    }
-//    else
-//        msg = inputMessages.at(msgTitle);
+void MainWindow::slotWriteMessage(std::string data) {
+    emit signWriteMessage(data);
+}
 
-//    FieldWidget *field = new FieldWidget(title);
-//    msg->addField(field);
-//}

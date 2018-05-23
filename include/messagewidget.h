@@ -22,6 +22,8 @@ class MessageWidget: public QWidget {
     Q_OBJECT
 public:
     MessageWidget(QWidget *parent = 0);
+    void updateFields(QString data);
+    void parseDocument(QString data);
 protected:
     void initWidgetsPanel();
     void initFieldsPanel();

@@ -53,7 +53,35 @@ void MessageWidget::init() {
     setLayout(layout);
 }
 
+void MessageWidget::parseDocument(QString data) {
+    document.Parse(data.toStdString().data());
+    document.GetObject();
+    Value &title = document["title"];
+    toggleBtn->setText(title.GetString());
+    for (auto &field: document["fields"].GetArray()) {
+        FieldWidget *fieldWidget;
+        switch (field["type"].GetInt()) {
+        case Field::NUMBER: {
+            fieldWidget = new NumbFW(&field);
+            break;
+        }
+        case Field::ENUM: {
+            fieldWidget = new EnumFW(&field);
+            break;
+        }
+        }
+        addField(fieldWidget);
+    }
+}
 
+void MessageWidget::updateFields(QString data) {
+    document.Parse(data.toStdString().data());
+    document.GetObject();
+    for (auto &field: document["fields"].GetArray()) {
+        QString title = field["title"].GetString();
+//        if (fields.find(title) != fields.end())
+        fields.at(title)->setField(&field);
+    }
 }
 
 void MessageWidget::slotClickedToggleBtn() {

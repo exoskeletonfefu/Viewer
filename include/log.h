@@ -9,6 +9,6 @@ public:
     void append(const QString &text);
 private:
 signals:
-    void appended(QString text);
+    void signAppended(QString text);
 public slots:
 };

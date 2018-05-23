@@ -3,5 +3,5 @@
 void Log::append(const QString &text) {
     QStringList::append(text);
     qDebug() << text;
-    emit appended(text);
+    emit signAppended(text);
 }

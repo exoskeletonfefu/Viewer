@@ -4,34 +4,23 @@
 #include <QTcpSocket>
 #include <QThreadPool>
 
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
-class Client: public QThread {
 class Client: public QObject {
     Q_OBJECT
 public:
-    Client();
-    void run();
     Client(QObject *parent = 0);
+//    int write(std::string data);
     void start();
 private:
     QTcpSocket *socket;
     quint16 blockSize;
     QByteArray currentBlock;
-
-//    void parseInt()
-//    void parseCommand(int command, rapidjson::Document document);
-//    void parseStateCommand(rapidjson::Value fields);
-//    void parseInitCommand(rapidjson::Value fields);
-signals:
-    void newNumber(QString, QString);
-    void updateNumber(QString, QString, int);
+signals:    
     void signAppendToLog(QString);
+    void signReaded(QString);
 public slots:
-    void connected();
-    void disconnected();
-    void readyRead();
-    void error(QAbstractSocket::SocketError socketError);
+    void slotWrite(std::string);
+    void slotConnected();
+    void slotDisconnected();
+    void slotReadyRead();
+    void slotError(QAbstractSocket::SocketError socketError);
 };

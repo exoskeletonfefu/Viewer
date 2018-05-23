@@ -4,35 +4,33 @@
 #include "client.h"
 
 using namespace std;
-using namespace rapidjson;
 
-Client::Client() {
 Client::Client(QObject *parent) :
     QObject(parent) {
     blockSize = 0;
 }
 
-void Client::run() {
 void Client::start() {
     socket = new QTcpSocket();
-    emit signAppendToLog("Client. A new socket created!");
+    emit signAppendToLog("A new socket created!");
 
-//    connect(socket, SIGNAL(connected()), this, SLOT(connected()), Qt::DirectConnection);
-//    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()), Qt::DirectConnection);
-//    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
-//    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)), Qt::DirectConnection);
+    connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()), Qt::DirectConnection);
+    connect(socket, SIGNAL(disconnected()), this, SLOT(slotDisconnected()), Qt::DirectConnection);
+    connect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()), Qt::DirectConnection);
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotError(QAbstractSocket::SocketError)), Qt::DirectConnection);
 
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(socket, SIGNAL(connected()), this, SLOT(connected()));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
+//    connect(socket, SIGNAL(disconnected()), this, SLOT(slotDisconnected()));
+//    connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
+//    connect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+//    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotError(QAbstractSocket::SocketError)));
 
-    socket->connectToHost("127.0.0.1", 1234);
-    exec();
+//    socket->connectToHost("127.0.0.1", 1234);
+    socket->connectToHost("172.20.10.12", 1234);
+
 //    exec();
 }
 
-void Client::error(QAbstractSocket::SocketError socketError) {
+void Client::slotError(QAbstractSocket::SocketError socketError) {
     switch (socketError) {
 //    case QAbstractSocket::RemoteHostClosedError: {
 //        emit signAppendToLog("Client. Error. Some");
@@ -52,7 +50,7 @@ void Client::error(QAbstractSocket::SocketError socketError) {
     }
 }
 
-void Client::connected() {
+void Client::slotConnected() {
     emit signAppendToLog("Client. Connected event");
 }
 
@@ -95,8 +93,12 @@ void Client::readyRead() {
     }
 }
 
-void Client::disconnected() {
-    emit signAppendToLog("Client. Disconnected");
+void Client::slotWrite(std::string data) {
+    socket->write(data.data(), data.size());
+}
+
+void Client::slotDisconnected() {
+    emit signAppendToLog("Disconnected");
     socket->deleteLater();
-    exit(0);
+//    exit(0);
 }

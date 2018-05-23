@@ -16,10 +16,24 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QListWidget" name="outputWidget"/>
+     <widget class="QScrollArea" name="outputWidget">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>233</width>
+         <height>519</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
     </item>
     <item>
-     <widget class="QTextBrowser" name="textBrowser"/>
+     <widget class="QTextBrowser" name="logTextBrowser"/>
     </item>
     <item>
      <widget class="QScrollArea" name="inputWidget">
@@ -31,7 +45,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>212</width>
+         <width>233</width>
          <height>519</height>
         </rect>
        </property>

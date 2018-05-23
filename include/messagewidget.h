@@ -39,3 +39,15 @@ public slots:
     void slotClickedToggleBtn();
 };
 
+class ControlMessageWidget: public MessageWidget {
+    Q_OBJECT
+public:
+    ControlMessageWidget(QWidget *parent = 0);
+    void addField(FieldWidget *field) override;
+private:
+    QPushButton *sendBtn;
+signals:
+    void signWriteData(std::string);
+public slots:
+    void slotClickedSendBtn();
+};

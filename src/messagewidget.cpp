@@ -96,4 +96,31 @@ void MessageWidget::addField(FieldWidget *field) {
     fieldsPanel->layout()->addWidget(field);
 }
 
+ControlMessageWidget::ControlMessageWidget(QWidget *parent) :
+    MessageWidget(parent) {
+    sendBtn = new QPushButton("send", this);
+    widgetsPanel->layout()->addWidget(sendBtn);
+
+    connect(sendBtn, SIGNAL(clicked()), this, SLOT(slotClickedSendBtn()));
+}
+
+void ControlMessageWidget::slotClickedSendBtn() {
+    for (auto &field: fields)
+        field.second->update();
+
+    StringBuffer buffer;
+    buffer.Clear();
+    Writer<StringBuffer> writer(buffer);
+    document.Accept(writer);
+    std::string result(2, 0);
+    result[0] = (char)((buffer.GetSize() >> 8) & 0xFF);
+    result[1] = (char)(buffer.GetSize() & 0xFF);
+    result.append(buffer.GetString());
+    emit signWriteData(result);
+}
+
+void ControlMessageWidget::addField(FieldWidget *field) {
+    fields.emplace(field->getTitleText(), field);
+    field->setEnabledValueW(true);
+    fieldsPanel->layout()->addWidget(field);
 }

@@ -54,42 +54,28 @@ void Client::slotConnected() {
     emit signAppendToLog("Client. Connected event");
 }
 
-void Client::readyRead() {
-    emit signAppendToLog("readyRead()");
-    if (blockSize == 0) {        
-        if (socket->bytesAvailable() < 2)
+void Client::slotReadyRead() {
+    QByteArray data = socket->readAll();
+    int index = 0;
+    while (true) {
+        if (blockSize == 0) {
+            if (data.size() - index < 2)
+                return;
+            currentBlock.clear();
+            blockSize = quint16((unsigned char)(data[index]) << 8 | (unsigned char)(data[index + 1]));
+            index += 2;
+        }
+        if (data.size() - index < blockSize) {
+            currentBlock.append(data.mid(index, -1));
+            blockSize -= data.size() - index;
             return;
-        currentBlock.clear();
-        char *buf = new char[2];
-        socket->read(buf, 2);
-        blockSize = quint16((unsigned char)(buf[0]) << 8 | (unsigned char)(buf[1]));
-    }
-    if (socket->bytesAvailable() < blockSize)
-        return;
-    QByteArray data = socket->read(blockSize);
-    currentBlock.append(data);
-    blockSize -= data.size();
-    if (blockSize != 0)
-        return;
-    emit signAppendToLog(currentBlock);
+        }
+        currentBlock.append(data.mid(index, blockSize));
+        index += blockSize;
+        blockSize = 0;
 
-    Document document;
-    document.Parse(currentBlock.toStdString().data());
-    document.GetObject();
-//    Value &command = document["command"];
-    Value &fields = document["fields"];
-    Value &title = document["title"];
-
-    for (auto &field: fields.GetArray()) {
-        switch (field["type"].GetInt()) {
-        case 0: {
-            emit updateNumber(title.GetString(), field["title"].GetString(), field["value"].GetInt());
-            break;
-        }
-        default: {
-            break;
-        }
-        }
+        emit signAppendToLog(currentBlock);
+        emit signReaded(currentBlock);
     }
 }
 

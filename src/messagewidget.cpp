@@ -3,33 +3,57 @@
 
 #include "messagewidget.h"
 
-MessageWidget::MessageWidget(QString title, QWidget *parent) :
-    QWidget(parent) {
-//    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+using namespace rapidjson;
 
-    toggleBtn = new QPushButton(title, this);
+MessageWidget::MessageWidget(QWidget *parent) :
+    QWidget(parent) {
+
+    toggleBtn = new QPushButton(this);
 //    toggleBtn->setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
-    fieldsW = new QWidget(this);
-    fieldsW->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    initFieldsPanel();
+    initWidgetsPanel();
+    init();
 
+    connect(toggleBtn, SIGNAL(clicked()), this, SLOT(slotClickedToggleBtn()));
+//    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+}
+
+void MessageWidget::initWidgetsPanel() {
+    widgetsPanel = new QWidget(this);
+    widgetsPanel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(fieldsPanel);
+    layout->setAlignment(Qt::AlignBottom);
+    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    widgetsPanel->setLayout(layout);
+}
+
+void MessageWidget::initFieldsPanel() {
+    fieldsPanel = new QWidget(this);
+    fieldsPanel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setAlignment(Qt::AlignTop);
+    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    fieldsPanel->setLayout(layout);
+}
+
+void MessageWidget::init() {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(toggleBtn);
-    layout->addWidget(fieldsW);
+    layout->addWidget(widgetsPanel);
     layout->setAlignment(Qt::AlignTop);
     layout->setMargin(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     setLayout(layout);
+}
 
-    QVBoxLayout *filedsWLayout = new QVBoxLayout;
-    filedsWLayout->setAlignment(Qt::AlignTop);
-    filedsWLayout->setMargin(0);
-    filedsWLayout->setContentsMargins(0, 0, 0, 0);
-    filedsWLayout->setSpacing(0);
-    fieldsW->setLayout(filedsWLayout);
 
-    connect(toggleBtn, SIGNAL(clicked()), this, SLOT(slotClickedToggleBtn()));
 }
 
 void MessageWidget::slotClickedToggleBtn() {

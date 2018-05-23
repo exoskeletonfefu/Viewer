@@ -85,18 +85,15 @@ void MessageWidget::updateFields(QString data) {
 }
 
 void MessageWidget::slotClickedToggleBtn() {
-    if (fieldsW->isHidden())
-        fieldsW->show();
+    if (widgetsPanel->isHidden())
+        widgetsPanel->show();
     else
-        fieldsW->hide();
+        widgetsPanel->hide();
 }
 
 void MessageWidget::addField(FieldWidget *field) {
     fields.emplace(field->getTitleText(), field);
-    fieldsW->layout()->addWidget(field);
+    fieldsPanel->layout()->addWidget(field);
 }
 
-void MessageWidget::updateField(QString title, int value) {
-    if (fields.find(title) != fields.end())
-        fields.at(title)->setValueText(value);
 }

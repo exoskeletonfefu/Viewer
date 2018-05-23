@@ -1,14 +1,16 @@
 #include "viewer.h"
 
 Viewer::Viewer() {
-    mainWindow = new MainWindow();
-    client = new Client();
-    log = new Log();
-    connect(log, SIGNAL(appended(QString)), mainWindow, SLOT(appendToLog(QString)));
+    mainWindow = new MainWindow;
+    client = new Client;
+    log = new Log;
+
+    connect(log, SIGNAL(signAppended(QString)), mainWindow, SLOT(slotAppendToLog(QString)));
     connect(client, SIGNAL(signAppendToLog(QString)), this, SLOT(slotAppendToLog(QString)));
-    connect(client, SIGNAL(updateNumber(QString, QString, int)), mainWindow, SLOT(updateNumber(QString, QString, int)));
-    connect(client, SIGNAL(newNumber(QString, QString)), mainWindow, SLOT(newNumber(QString, QString)));
-    connect(client, SIGNAL(finished()), client, SLOT(deleteLater()));
+    connect(client, SIGNAL(signReaded(QString)), this, SLOT(slotParseMessage(QString)));
+//    connect(client, SIGNAL(finished()), client, SLOT(deleteLater()));
+    connect(mainWindow, SIGNAL(signWriteMessage(std::string)), client, SLOT(slotWrite(std::string)));
+
     client->start();
 }
 

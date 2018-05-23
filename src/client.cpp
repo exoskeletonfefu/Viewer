@@ -7,10 +7,13 @@ using namespace std;
 using namespace rapidjson;
 
 Client::Client() {
+Client::Client(QObject *parent) :
+    QObject(parent) {
     blockSize = 0;
 }
 
 void Client::run() {
+void Client::start() {
     socket = new QTcpSocket();
     emit signAppendToLog("Client. A new socket created!");
 
@@ -26,6 +29,7 @@ void Client::run() {
 
     socket->connectToHost("127.0.0.1", 1234);
     exec();
+//    exec();
 }
 
 void Client::error(QAbstractSocket::SocketError socketError) {

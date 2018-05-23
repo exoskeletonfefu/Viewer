@@ -9,10 +9,13 @@
 #include "rapidjson/stringbuffer.h"
 
 class Client: public QThread {
+class Client: public QObject {
     Q_OBJECT
 public:
     Client();
     void run();
+    Client(QObject *parent = 0);
+    void start();
 private:
     QTcpSocket *socket;
     quint16 blockSize;
